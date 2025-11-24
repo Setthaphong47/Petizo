@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -22,14 +21,52 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
-// Database Connection
-const db = new sqlite3.Database('./petizo.db', (err) => {
-    if (err) {
-        console.error('❌ Error opening database:', err);
-    } else {
-        console.log('✅ เชื่อมต่อ Database สำเร็จ');
-    }
-});
+// Database Connection - Use PostgreSQL on production, SQLite locally
+let db;
+if (process.env.POSTGRES_URL) {
+    // Production - PostgreSQL (Vercel/Neon)
+    const { Pool } = require('pg');
+    const pool = new Pool({
+        connectionString: process.env.POSTGRES_URL,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
+    
+    console.log('📊 Using PostgreSQL (Production)');
+    
+    // Wrapper to make pg work like sqlite3
+    db = {
+        run: function(sql, params = [], callback = () => {}) {
+            const values = Array.isArray(params) ? params : [];
+            pool.query(sql, values)
+                .then(() => callback(null))
+                .catch(err => callback(err));
+        },
+        get: function(sql, params = [], callback = () => {}) {
+            const values = Array.isArray(params) ? params : [];
+            pool.query(sql, values)
+                .then(result => callback(null, result.rows[0]))
+                .catch(err => callback(err));
+        },
+        all: function(sql, params = [], callback = () => {}) {
+            const values = Array.isArray(params) ? params : [];
+            pool.query(sql, values)
+                .then(result => callback(null, result.rows))
+                .catch(err => callback(err));
+        }
+    };
+    
+    console.log('✅ Connected to PostgreSQL');
+} else {
+    // Local Development - SQLite
+    const sqlite3 = require('sqlite3').verbose();
+    db = new sqlite3.Database('./petizo.db', (err) => {
+        if (err) {
+            console.error('❌ Error opening database:', err);
+        } else {
+            console.log('✅ เชื่อมต่อ Database สำเร็จ (SQLite)');
+        }
+    });
+}
 
 // File Upload Configuration
 const fileFilter = (req, file, cb) => {
