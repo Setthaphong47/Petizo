@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Pet - Petizo</title>
+
+    <!-- ⚡ Preload Critical Resources -->
+    <link rel="preload" href="/css/navbar.css" as="style">
+    <link rel="preload" href="/js/navbar.js" as="script">
+    <link rel="preload" href="/icon/cat.png" as="image">
+    
+    <!-- 🎨 Navbar CSS (แยกออกมาแล้ว - จะถูก cache) -->
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #e0f7fa 0%, #f8f9fa 100%);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 40px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .breadcrumb a {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00bcd4;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #6c757d;
+        }
+
+        /* Pet Grid */
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pet Card - Modern Design */
+        .pet-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .pet-card:nth-child(1) { animation-delay: 0.1s; }
+        .pet-card:nth-child(2) { animation-delay: 0.2s; }
+        .pet-card:nth-child(3) { animation-delay: 0.3s; }
+        .pet-card:nth-child(4) { animation-delay: 0.4s; }
+        .pet-card:nth-child(5) { animation-delay: 0.5s; }
+        .pet-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pet-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 188, 212, 0.15);
+        }
+
+        .pet-card-header {
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            padding: 20px;
+            position: relative;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pet-card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="60" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="80" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .pet-actions-floating {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        /* Tooltip */
+        .action-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 48px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            background: #1a1a1a;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .action-icon:hover::after {
+            transform: translateY(-50%) scale(1);
+            opacity: 1;
+        }
+
+        .pet-card-body {
+            padding: 24px;
+            position: relative;
+            margin-top: -40px;
+        }
+
+        .pet-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            border: 5px solid white;
+            box-shadow: 0 8px 24px rgba(0, 188, 212, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pet-info {
+            text-align: center;
+        }
+
+        .pet-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .gender-badge {
+            font-size: 20px;
+            opacity: 0.7;
+        }
+
+        .pet-breed {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e0f7fa;
+            color: #00695c;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .pet-details {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .detail-icon {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Add Pet Card */
+        .add-pet-card {
+            background: linear-gradient(135deg, rgba(0, 188, 212, 0.05) 0%, rgba(0, 229, 255, 0.05) 100%);
+            border: 3px dashed #00bcd4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .add-pet-card:hover {
+            background: linear-gradient(135deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 229, 255, 0.1) 100%);
+            border-color: #00e5ff;
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .add-pet-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 188, 212, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .add-pet-card:hover .add-pet-icon {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .add-pet-text {
+            color: #00695c;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 20px;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        /* Modal - Same as before */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content-pet {
+            background: white;
+            border-radius: 24px;
+            max-width: 950px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .close-btn-top {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .close-btn-top:hover {
+            background: white;
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        .modal-pet-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .pet-photo-section {
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .pet-photo-upload {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border: 4px solid rgba(255,255,255,0.5);
+        }
+
+        .photo-placeholder {
+            font-size: 64px;
+            color: #ddd;
+        }
+
+        .pet-photo-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-btn {
+            position: absolute;
+            bottom: 30px;
+            width: 56px;
+            height: 56px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .camera-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-hint {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .pet-form-section {
+            padding: 40px;
+            background: #fafbfc;
+            overflow-y: auto;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+
+        .form-row-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .btn-cancel {
+            padding: 16px;
+            background: white;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .btn-save {
+            padding: 16px;
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 188, 212, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .pets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-pet-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .pet-photo-section {
+                padding: 30px 20px;
+            }
+
+            .form-row-2col {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> >> <span>Your Pet</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Your Pets</h1>
+            <p class="page-subtitle">จัดการข้อมูลสัตว์เลี้ยงของคุณ</p>
+        </div>
+
+        <div class="pets-grid" id="petsGrid">
+            <div class="loading">กำลังโหลดข้อมูล</div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Pet Modal -->
+    <div id="petModal" class="modal">
+        <div class="modal-content-pet">
+            <button class="close-btn-top" onclick="closePetModal()">&times;</button>
+            
+            <form id="petForm" onsubmit="handleSubmitPet(event)">
+                <input type="hidden" id="petId">
+
+                <div class="modal-pet-layout">
+                    <!-- Left: Photo -->
+                    <div class="pet-photo-section">
+                        <div class="pet-photo-upload" id="photoPreview">
+                            <div class="photo-placeholder">+</div>
+                        </div>
+                        <input type="file" id="petPhoto" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+                        <button type="button" class="camera-btn" onclick="document.getElementById('petPhoto').click()">
+                            <img src="/icon/cute-camera.png" alt="Camera" style="width:20px;height:20px;">
+                        </button>
+                        <div class="photo-hint">คลิกเพื่ออัปโหลดรูป</div>
+                    </div>
+
+                    <!-- Right: Form -->
+                    <div class="pet-form-section">
+                        <h2 class="form-title">ข้อมูลสัตว์เลี้ยง</h2>
+                        
+                        <div class="form-group">
+                            <label>ชื่อ <span class="required">*</span></label>
+                            <input type="text" id="petName" required placeholder="ชื่อของน้องหมา/แมว">
+                        </div>
+
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label>ชนิดสัตว์เลี้ยง</label>
+                                <select id="petType">
+                                    <option value="แมว">แมว</option>
+                                    <option value="สุนัข">สุนัข</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>เพศ</label>
+                                <select id="petGender">
+                                    <option value="">- เลือกเพศ -</option>
+                                    <option value="male">เพศผู้</option>
+                                    <option value="female">เพศเมีย</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>วันเกิด</label>
+                            <input type="date" id="petBirthDate">
+                        </div>
+
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label>สายพันธุ์</label>
+                                <input type="text" id="petBreed" placeholder="เช่น แมงก็อล, เปอร์เซีย">
+                            </div>
+                            <div class="form-group">
+                                <label>สี</label>
+                                <input type="text" id="petColor" placeholder="เช่น ขาว, ลายส้ม">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>น้ำหนัก (กิโลกรัม)</label>
+                            <input type="number" id="petWeight" step="0.1" min="0" placeholder="5.1">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="closePetModal()">ยกเลิก</button>
+                            <button type="submit" class="btn-save">บันทึก</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script>
+        const API_URL = CONFIG.API_URL || 'http://localhost:3000/api';
+        let currentPetId = null;
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    const displayNameElement = document.getElementById('userDisplayName');
+                    if (displayNameElement) {
+                        displayNameElement.textContent = userData.full_name || userData.username;
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+            return true;
+        }
+
+        async function loadPets() {
+            if (!checkAuth()) return;
+
+            try {
+                const response = await fetch(`${API_URL}/pets`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    displayPets([]);
+                    return;
+                }
+
+                const pets = await response.json();
+                displayPets(pets);
+            } catch (error) {
+                console.error('Error:', error);
+                displayPets([]);
+            }
+        }
+
+        function displayPets(pets) {
+            const grid = document.getElementById('petsGrid');
+            let html = '';
+
+            pets.forEach(pet => {
+                const birthDate = pet.birth_date 
+                    ? new Date(pet.birth_date).toLocaleDateString('th-TH', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    })
+                    : 'ไม่ระบุ';
+
+                const genderIcon = pet.gender === 'male' ? '<img src="/icon/gender (1).png" alt="male" style="width:30px;height:30px;">' : pet.gender === 'female' ? '<img src="/icon/gender.png" alt="Female" style="width:30px;height:30px;">' : '';
+                const genderText = pet.gender === 'male' ? 'เพศผู้' : pet.gender === 'female' ? 'เพศเมีย' : '';
+
+                html += `
+                    <div class="pet-card">
+                        <div class="pet-card-header">
+                            <div class="pet-actions-floating">
+                                <button class="action-icon" 
+                                        onclick="window.location.href='pet-details.html?id=${pet.id}'" 
+                                        data-tooltip="ตารางวัคซีนแนะนำ">
+                                    <img src="/icon/health-check.png" alt="Information" style="width:20px;height:20px;">
+                                </button>
+                                <button class="action-icon" 
+                                        onclick="window.location.href='vaccination-record.html?petId=${pet.id}'" 
+                                        data-tooltip="สมุดวัคซีน">
+                                    <img src="/icon/medical-book.png" alt="Vac Book" style="width:20px;height:20px;">
+                                </button>
+                                <button class="action-icon" 
+                                        onclick="editPet(${pet.id})" 
+                                        data-tooltip="แก้ไข">
+                                    <img src="/icon/edit.png" alt="Edit" style="width:20px;height:20px;">
+                                </button>
+                                <button class="action-icon" 
+                                        onclick="deletePet(${pet.id}, '${pet.name}')" 
+                                        data-tooltip="ลบ">
+                                    <img src="/icon/bin.png" alt="Delete" style="width:20px;height:20px;">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="pet-card-body">
+                            <div class="pet-photo">
+                                ${pet.photo_url 
+                                    ? `<img src="${pet.photo_url}" alt="${pet.name}">` 
+                                    : '<img src="/icon/bin.png" alt="Name Cat" style="width:20px;height:20px;">'}
+                            </div>
+                            <div class="pet-info">
+                                <div class="pet-name">
+                                    ${pet.name}
+                                    ${genderIcon ? `<span class="gender-badge">${genderIcon}</span>` : ''}
+                                </div>
+                                ${pet.breed ? `<div class="pet-breed">${pet.breed}</div>` : ''}
+                                <div class="pet-details">
+                                    ${genderText ? `
+                                        <div class="detail-item">
+                                            <span class="detail-icon">${genderIcon}</span>
+                                            <span>${genderText}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${pet.color ? `
+                                        <div class="detail-item">
+                                            <span class="detail-icon"><img src="/icon/stray-cat.png" alt="Color" style="width:30px;height:30px;"></span>
+                                            <span>${pet.color}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="detail-item">
+                                        <span class="detail-icon"><img src="/icon/birthday.png" alt="Birth Date" style="width:30px;height:30px;"></span>
+                                        <span>${birthDate}</span>
+                                    </div>
+                                    ${pet.weight ? `
+                                        <div class="detail-item">
+                                            <span class="detail-icon"><img src="/icon/scale.png" alt="Weight" style="width:30px;height:30px;"></span>
+                                            <span>${pet.weight} กก.</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="pet-card add-pet-card" onclick="openAddPetModal()">
+                    <div class="add-pet-icon">+</div>
+                    <div class="add-pet-text">เพิ่มสัตว์เลี้ยงใหม่</div>
+                </div>
+            `;
+
+            grid.innerHTML = html;
+        }
+
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function closePetModal() {
+            document.getElementById('petModal').classList.remove('active');
+            document.getElementById('petForm').reset();
+            document.getElementById('photoPreview').innerHTML = '<div class="photo-placeholder">+</div>';
+        }
+
+        function openAddPetModal() {
+            currentPetId = null;
+            document.getElementById('petForm').reset();
+            document.getElementById('petId').value = '';
+            document.getElementById('photoPreview').innerHTML = '<div class="photo-placeholder">+</div>';
+            document.getElementById('petModal').classList.add('active');
+        }
+
+        async function editPet(petId) {
+            try {
+                const response = await fetch(`${API_URL}/pets/${petId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load pet');
+
+                const pet = await response.json();
+                
+                currentPetId = petId;
+                document.getElementById('petId').value = petId;
+                document.getElementById('petName').value = pet.name || '';
+                document.getElementById('petType').value = pet.type || 'แมว';
+                document.getElementById('petGender').value = pet.gender || '';
+                document.getElementById('petBreed').value = pet.breed || '';
+                document.getElementById('petColor').value = pet.color || '';
+                document.getElementById('petWeight').value = pet.weight || '';
+                
+                if (pet.birth_date) {
+                    document.getElementById('petBirthDate').value = pet.birth_date;
+                }
+                
+                if (pet.photo_url) {
+                    document.getElementById('photoPreview').innerHTML = `<img src="${pet.photo_url}">`;
+                }
+                
+                document.getElementById('petModal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('ไม่สามารถโหลดข้อมูลได้');
+            }
+        }
+
+        async function handleSubmitPet(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('petName').value);
+            formData.append('breed', document.getElementById('petBreed').value);
+            formData.append('gender', document.getElementById('petGender').value);
+            formData.append('birth_date', document.getElementById('petBirthDate').value);
+            formData.append('color', document.getElementById('petColor').value);
+            
+            const weight = parseFloat(document.getElementById('petWeight').value);
+            if (!isNaN(weight)) {
+                formData.append('weight', weight);
+            }
+            
+            formData.append('microchip_id', '');
+            formData.append('notes', '');
+
+            const photoFile = document.getElementById('petPhoto').files[0];
+            if (photoFile) {
+                formData.append('photo', photoFile);
+            }
+
+            try {
+                const petId = document.getElementById('petId').value;
+                const url = petId ? `${API_URL}/pets/${petId}` : `${API_URL}/pets`;
+                const method = petId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Failed to save pet');
+
+                alert(petId ? '✅ อัปเดตข้อมูลสำเร็จ' : '✅ เพิ่มสัตว์เลี้ยงสำเร็จ');
+                closePetModal();
+                loadPets();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ ไม่สามารถบันทึกข้อมูลได้');
+            }
+        }
+
+        async function deletePet(petId, petName) {
+            if (!confirm(`ต้องการลบ "${petName}" หรือไม่?\n\n⚠️ การดำเนินการนี้ไม่สามารถย้อนกลับได้`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/pets/${petId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete pet');
+
+                alert('✅ ลบข้อมูลสำเร็จ');
+                loadPets();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ ไม่สามารถลบข้อมูลได้');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth(); // เช็คว่า login แล้วหรือยัง ถ้ายังให้ redirect
+            loadPets();
+        });
+    </script>
+
+    <!-- Load Scripts -->
+    <script src="/js/navbar.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/profile-dropdown.js"></script>
+    <script src="/js/auth-common.js"></script>
+</body>
+</html>

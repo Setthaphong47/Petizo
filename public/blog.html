@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Petizo</title>
+
+    <!-- ⚡ Preload Critical Resources -->
+    <link rel="preload" href="/css/navbar.css" as="style">
+    <link rel="preload" href="/js/navbar.js" as="script">
+    <link rel="preload" href="/icon/cat.png" as="image">
+    
+    <!-- 🎨 Navbar CSS (แยกออกมาแล้ว - จะถูก cache) -->
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 40px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #00bcd4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00e5ff;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 56px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00bcd4;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #999;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #00d4ff 0%, #00bdeb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 20px;
+        }
+
+        .blog-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .blog-excerpt {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-clamp: 3;
+            overflow: hidden;
+        }
+
+        .blog-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #00d4ff;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #adb5bd;
+        }
+
+        .blog-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> >> <span>Blog</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Blog</h1>
+            
+            <div class="search-box">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput" 
+                       placeholder="Search Blog..."
+                       onkeyup="searchBlogs()">
+                <span class="search-icon">🔍</span>
+                <!--<img src="/icon/search (1).png" alt="Search" style="width:40px;height:40px;">-->
+            </div>
+        </div>
+
+        <div class="blog-grid" id="blogGrid">
+            <div class="loading">กำลังโหลดบทความ...</div>
+        </div>
+    </div>
+
+    <!-- ⚡ โหลด Navbar JavaScript ก่อน -->
+    <script src="/js/navbar.js"></script>
+    
+    <!-- 📜 โหลด Config และ Scripts อื่นๆ -->
+    <script src="/js/config.js"></script>
+    <script src="/js/profile-dropdown.js"></script>
+    <script src="/js/auth-common.js"></script>
+
+    <script>
+        var allPosts = [];
+        var filteredPosts = [];
+
+        // Handle Your Pet link click
+        function handleYourPetClick(event) {
+            event.preventDefault();
+            var token = localStorage.getItem('token');
+            
+            if (!token) {
+                alert('กรุณาเข้าสู่ระบบก่อนเพื่อเข้าถึงหน้า Your Pet');
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = 'your-pet.html';
+            }
+        }
+
+        // Load all blog posts
+        async function loadBlogPosts() {
+            try {
+                var response = await fetch('http://localhost:3000/api/blog');
+                var posts = await response.json();
+                
+                // Filter only published posts
+                allPosts = [];
+                for (var i = 0; i < posts.length; i++) {
+                    if (posts[i].status === 'published') {
+                        allPosts.push(posts[i]);
+                    }
+                }
+                
+                filteredPosts = allPosts;
+                displayBlogPosts(filteredPosts);
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+                document.getElementById('blogGrid').innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>ไม่สามารถโหลดบทความได้</p></div>';
+            }
+        }
+
+        // Display blog posts
+        function displayBlogPosts(posts) {
+            var blogGrid = document.getElementById('blogGrid');
+            
+            if (!posts || posts.length === 0) {
+                blogGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>ไม่พบบทความ</p></div>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < posts.length; i++) {
+                var post = posts[i];
+                var publishDate = new Date(post.published_at || post.created_at);
+                var formattedDate = publishDate.toLocaleDateString('th-TH', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                // Get tags
+                var tags = [];
+                if (post.tags) {
+                    var tagArray = post.tags.split(',');
+                    for (var j = 0; j < tagArray.length; j++) {
+                        var tag = tagArray[j].trim();
+                        if (tag) {
+                            tags.push(tag);
+                        }
+                    }
+                }
+                var firstTag = tags.length > 0 ? tags[0] : (post.category || 'ทั่วไป');
+                
+                // Image
+                var imageHtml = post.featured_image 
+                    ? '<img src="' + post.featured_image + '" alt="' + post.title + '">' 
+                    : '🐱';
+                
+                // Excerpt
+                var excerpt = post.excerpt || (post.content.substring(0, 100) + '...');
+                
+                html += '<div class="blog-card" onclick="window.location.href=\'blog-detail.html?slug=' + post.slug + '\'">';
+                html += '<div class="blog-image">' + imageHtml + '</div>';
+                html += '<div class="blog-content">';
+                html += '<h3 class="blog-title">' + post.title + '</h3>';
+                html += '<p class="blog-excerpt">' + excerpt + '</p>';
+                html += '<span class="blog-badge">อ่านเพิ่มเติม</span>';
+                html += '<div class="blog-meta">';
+                html += '<span>#' + firstTag + '</span>';
+                html += '<img src="/icon/view.png" alt="View" style="width:20px;height:20px;"> 10 ';
+                html += '<img src="/icon/calendar (2).png" alt="Date" style="width:20px;height:20px;">' + formattedDate + '</span>';
+                html += '</div></div></div>';
+            }
+            
+            blogGrid.innerHTML = html;
+        }
+
+        // Search blogs
+        function searchBlogs() {
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filteredPosts = allPosts;
+            } else {
+                filteredPosts = [];
+                for (var i = 0; i < allPosts.length; i++) {
+                    var post = allPosts[i];
+                    var title = post.title.toLowerCase();
+                    var content = post.content.toLowerCase();
+                    var tags = post.tags ? post.tags.toLowerCase() : '';
+                    var category = post.category ? post.category.toLowerCase() : '';
+                    
+                    if (title.indexOf(searchTerm) !== -1 || 
+                        content.indexOf(searchTerm) !== -1 || 
+                        tags.indexOf(searchTerm) !== -1 ||
+                        category.indexOf(searchTerm) !== -1) {
+                        filteredPosts.push(post);
+                    }
+                }
+            }
+            
+            displayBlogPosts(filteredPosts);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadBlogPosts();
+
+            // Add event listener to Your Pet link
+            const yourPetLink = document.getElementById('yourPetLink');
+            if (yourPetLink) {
+                yourPetLink.addEventListener('click', handleYourPetClick);
+            }
+        });
+
+    </script>
+</body>
+</html>

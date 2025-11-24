@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลผู้ใช้งาน - Petizo</title>
+
+    <!-- ⚡ Preload Critical Resources -->
+    <link rel="preload" href="/css/navbar.css" as="style">
+    <link rel="preload" href="/js/navbar.js" as="script">
+    <link rel="preload" href="/icon/cat.png" as="image">
+    
+    <!-- 🎨 Navbar CSS (แยกออกมาแล้ว - จะถูก cache) -->
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+        }
+
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            padding: 20px 40px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #00bcd4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #00e5ff;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .profile-info h2 {
+            font-size: 28px;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .profile-info p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .info-section h3 {
+            font-size: 20px;
+            color: #212529;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #212529;
+        }
+
+        /* Change Password Section */
+        .change-password-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+            margin-left: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .info-label {
+                font-weight: 600;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- ⚡ โหลด Navbar JavaScript ก่อน -->
+    <script src="/js/navbar.js"></script>
+    
+    <!-- 📜 โหลด Config และ Scripts อื่นๆ -->
+    <script src="/js/config.js"></script>
+    <script src="/js/profile-dropdown.js"></script>
+    <script src="/js/auth-common.js"></script>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> >> <span>ข้อมูลผู้ใช้งาน</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-info">
+                    <h2 id="displayFullName">ชื่อผู้ใช้</h2>
+                    <p id="displayEmail">email@example.com</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>📋 ข้อมูลส่วนตัว</h3>
+                <div class="info-grid">
+                    <div class="info-label">ชื่อผู้ใช้:</div>
+                    <div class="info-value" id="infoUsername">-</div>
+                    
+                    <div class="info-label">ชื่อ-สกุล:</div>
+                    <div class="info-value" id="infoFullName">-</div>
+                    
+                    <div class="info-label">อีเมล:</div>
+                    <div class="info-value" id="infoEmail">-</div>
+                    
+                    <div class="info-label">จำนวนสัตว์เลี้ยง:</div>
+                    <div class="info-value" id="infoPetCount">0</div>
+                    
+                    <div class="info-label">สมัครเมื่อ:</div>
+                    <div class="info-value" id="infoCreatedAt">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="change-password-card">
+            <h3 style="margin-bottom: 24px;">🔐 เปลี่ยนรหัสผ่าน</h3>
+            
+            <div class="alert alert-success" id="successAlert">
+                เปลี่ยนรหัสผ่านสำเร็จ!
+            </div>
+            
+            <div class="alert alert-danger" id="errorAlert">
+                เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง
+            </div>
+
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label class="form-label" for="currentPassword">รหัสผ่านปัจจุบัน</label>
+                    <input type="password" class="form-input" id="currentPassword" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="newPassword">รหัสผ่านใหม่</label>
+                    <input type="password" class="form-input" id="newPassword" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">ยืนยันรหัสผ่านใหม่</label>
+                    <input type="password" class="form-input" id="confirmPassword" required minlength="6">
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script>
+        const API_URL = CONFIG.API_URL;
+
+        // Check if user is logged in
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                alert('กรุณาเข้าสู่ระบบก่อน');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            loadUserProfile();
+        }
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                // loading user profile
+                
+                // Fetch latest user data from API
+                const response = await fetch(`${API_URL}/user/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    
+                    // อัพเดท localStorage ด้วยข้อมูลล่าสุด
+                    const existingUser = JSON.parse(localStorage.getItem('user'));
+                    const updatedUser = { ...existingUser, ...userData };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    
+                    displayUserInfo(userData);
+                } else {
+                    console.error('API Error:', response.status);
+                    // Fallback to local storage
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    displayUserInfo(user);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                // Fallback to local storage
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    displayUserInfo(user);
+                } else {
+                    alert('ไม่สามารถโหลดข้อมูลได้');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Display user info
+        function displayUserInfo(user) {
+            // displaying user info
+            
+            if (!user) {
+                console.error('No user data to display');
+                return;
+            }
+            
+            // Update header
+            const displayName = user.full_name || user.username || 'ผู้ใช้';
+            document.getElementById('userDisplayName').textContent = displayName;
+            document.getElementById('displayFullName').textContent = displayName;
+            document.getElementById('displayEmail').textContent = user.email || '-';
+            
+            // Update info section
+            document.getElementById('infoUsername').textContent = user.username || '-';
+            document.getElementById('infoFullName').textContent = user.full_name || '-';
+            document.getElementById('infoEmail').textContent = user.email || '-';
+            document.getElementById('infoPetCount').textContent = user.pet_count || 0;
+            
+            // Update created date
+            if (user.created_at) {
+                try {
+                    const date = new Date(user.created_at);
+                    const formattedDate = date.toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    document.getElementById('infoCreatedAt').textContent = formattedDate;
+                } catch (e) {
+                    console.error('Date formatting error:', e);
+                    document.getElementById('infoCreatedAt').textContent = '-';
+                }
+            } else {
+                document.getElementById('infoCreatedAt').textContent = '-';
+            }
+        }
+
+        // Handle password change
+        document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Hide alerts
+            document.getElementById('successAlert').classList.remove('show');
+            document.getElementById('errorAlert').classList.remove('show');
+            
+            // Validate
+            if (newPassword !== confirmPassword) {
+                document.getElementById('errorAlert').textContent = 'รหัสผ่านใหม่ไม่ตรงกัน';
+                document.getElementById('errorAlert').classList.add('show');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                document.getElementById('errorAlert').textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+                document.getElementById('errorAlert').classList.add('show');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/user/change-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('successAlert').classList.add('show');
+                    document.getElementById('changePasswordForm').reset();
+                    
+                    setTimeout(() => {
+                        document.getElementById('successAlert').classList.remove('show');
+                    }, 3000);
+                } else {
+                    const data = await response.json();
+                    document.getElementById('errorAlert').textContent = data.error || 'เกิดข้อผิดพลาด';
+                    document.getElementById('errorAlert').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorAlert').textContent = 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้';
+                document.getElementById('errorAlert').classList.add('show');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileBtn = document.getElementById('profileBtn');
+            
+            if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('changePasswordForm').reset();
+            document.getElementById('successAlert').classList.remove('show');
+            document.getElementById('errorAlert').classList.remove('show');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>

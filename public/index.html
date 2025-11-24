@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petizo - ระบบจัดการข้อมูลแมว</title>
+
+    <!-- ⚡ Preload Critical Resources -->
+    <link rel="preload" href="/css/navbar.css" as="style">
+    <link rel="preload" href="/js/navbar.js" as="script">
+    <link rel="preload" href="/icon/cat.png" as="image">
+    
+    <!-- Font Awesome for chat icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- 🎨 Styles -->
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/chat-popup.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(180deg, #fff 0%, #e8f4f8 100%);
+            padding: 60px 40px 40px;
+            text-align: center;
+        }
+
+        .hero-image {
+            max-width: 600px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .feature-desc {
+            font-size: 15px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        /* Blog Section */
+        .blog-section {
+            padding: 60px 40px;
+            background: white;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #1a1a1a;
+        }
+
+        .blog-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect fill='%23e8f4f8' width='800' height='400'/%3E%3Ctext x='400' y='200' font-size='120' text-anchor='middle' fill='%23aaa'%3E�%3C/text%3E%3C/svg%3E" 
+             alt="Cat" class="hero-image">
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <img src="/icon/like.png" alt="Blog" style="width:100px;height:100px;">
+                <h3 class="feature-title">Pet Health Knowledge Base</h3>
+                <p class="feature-desc">เข้าถึงบทความและคำแนะนำเกี่ยวกับประโยชน์ของการดูแลสัตว์เลี้ยงมากมาย</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="/icon/bot-assistant.png" alt="Chatbot" style="width:100px;height:100px;">
+                <h3 class="feature-title">Smart Chatbot</h3>
+                <p class="feature-desc">ระบบแชทบอทอัจฉริยะด้วยชื่อเสียงจากการให้คำแนะนำเบื้องต้นในการดูแล</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="/icon/dog.png" alt="Pet Profile" style="width:100px;height:100px;">
+                <h3 class="feature-title">Pet Profile Management</h3>
+                <p class="feature-desc">ข้อมูลรูปแบบความรู้สุขภาพสัตว์เลี้ยงในไม่มีโครงผ่านตัว</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="/icon/vaccination.png" alt="Vaccine" style="width:100px;height:100px;">
+                <h3 class="feature-title">Digital Vaccine Record</h3>
+                <p class="feature-desc">บันทึกและติดตามประวัติการฉีดวัคซีนแมวของคุณแบบดิจิทัล</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="/icon/alarm.png" alt="Alter" style="width:100px;height:100px;">
+                <h3 class="feature-title">Smart Notification System</h3>
+                <p class="feature-desc">แจ้งเตือนเมื่อถึงกำหนดนัดหมายกับสัตวแพทย์หรือต้องฉีด</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="/icon/file.png" alt="Share" style="width:100px;height:100px;">
+                <h3 class="feature-title">Share Health Data</h3>
+                <p class="feature-desc">แชร์ประวัติเกี่ยวกับสุขภาพสัตว์เลี้ยงของคุณกับสัตวแพทย์ได้ง่าย</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section class="blog-section">
+        <h2 class="section-title">Latest BLOGS</h2>
+        
+        <div class="blog-grid" id="blogGrid">
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">
+                กำลังโหลดบทความ...
+            </div>
+        </div>
+    </section>
+
+    <!-- ⚡ โหลด Navbar JavaScript ก่อน -->
+    <script src="/js/navbar.js"></script>
+    
+    <!-- 📜 โหลด Config และ Scripts อื่นๆ -->
+    <script src="/js/config.js"></script>
+    <script src="/js/profile-dropdown.js"></script>
+    <script src="/js/auth-common.js"></script>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Navigation functions
+        function handleYourPetClick(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                alert('กรุณาเข้าสู่ระบบก่อนเพื่อเข้าถึงหน้า Your Pet');
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = 'your-pet.html';
+            }
+        }
+
+        // Load latest blog posts
+        async function loadLatestBlogs() {
+            try {
+                const response = await fetch(`${API_URL}/blog`);
+                const blogs = await response.json();
+                
+                const blogGrid = document.getElementById('blogGrid');
+                
+                if (blogs && blogs.length > 0) {
+                    blogGrid.innerHTML = blogs.slice(0, 6).map(blog => `
+                        <div class="blog-card" onclick="window.location.href='blog-detail.html?slug=${blog.slug}'">
+                            <div class="blog-image">
+                                ${blog.featured_image 
+                                    ? `<img src="${blog.featured_image}" alt="${blog.title}">` 
+                                    : '<div style="background: linear-gradient(135deg, #00bcd4 0%, #00e5ff 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px;">📝</div>'}
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-category">${blog.category || 'ทั่วไป'}</div>
+                                <h3 class="blog-title">${blog.title}</h3>
+                                <p class="blog-excerpt">${blog.excerpt || ''}</p>
+                                <div class="blog-meta">
+                                    <span><img src="/icon/calendar (2).png" alt="Date" style="width:24px;height:24px;"> ${new Date(blog.created_at).toLocaleDateString('th-TH')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    blogGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">ยังไม่มีบทความ</div>';
+                }
+            } catch (error) {
+                console.error('Error loading blogs:', error);
+                document.getElementById('blogGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">ไม่สามารถโหลดบทความได้</div>';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLatestBlogs();
+            
+            // Setup Your Pet link
+            const yourPetLink = document.getElementById('yourPetLink');
+            if (yourPetLink) {
+                yourPetLink.addEventListener('click', handleYourPetClick);
+            }
+        });
+
+        // NOTE: Notifications handled by navbar.js
+    </script>
+
+    <style>
+        /* Blog Card Styles */
+        .blog-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 24px;
+        }
+
+        .blog-category {
+            display: inline-block;
+            background: #00bcd4;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .blog-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .blog-excerpt {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-clamp: 3;
+            overflow: hidden;
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: #adb5bd;
+        }
+    </style>
+
+    <script src="/js/chat-popup.js"></script>
+    
+</body>
+</html>

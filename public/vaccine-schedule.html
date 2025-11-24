@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตารางวัคซีน - Petizo</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .brand-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Pet Header Card */
+        .pet-header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pet-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .pet-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .pet-info {
+            flex: 1;
+        }
+
+        .pet-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .pet-age {
+            display: inline-block;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .pet-details {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Page Title */
+        .page-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-badge {
+            background: #ff4757;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Vaccine Timeline */
+        .vaccine-timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #e0e0e0);
+        }
+
+        .vaccine-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -29px;
+            top: 24px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            z-index: 1;
+        }
+
+        .timeline-dot.completed {
+            background: #52c41a;
+            border-color: #52c41a;
+        }
+
+        .timeline-dot.overdue {
+            background: #ff4757;
+            border-color: #ff4757;
+        }
+
+        .timeline-dot.due {
+            background: #ffa502;
+            border-color: #ffa502;
+        }
+
+        /* Vaccine Card */
+        .vaccine-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid #e0e0e0;
+        }
+
+        .vaccine-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .vaccine-card.completed {
+            border-left-color: #52c41a;
+            background: #f6ffed;
+        }
+
+        .vaccine-card.due {
+            border-left-color: #ffa502;
+            background: #fffbf0;
+        }
+
+        .vaccine-card.overdue {
+            border-left-color: #ff4757;
+            background: #fff1f0;
+        }
+
+        .vaccine-card.upcoming {
+            border-left-color: #d3d3d3;
+            opacity: 0.7;
+        }
+
+        .vaccine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .vaccine-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .vaccine-date {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .vaccine-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-due { background: #fff3cd; color: #856404; }
+        .status-overdue { background: #f8d7da; color: #721c24; }
+        .status-upcoming { background: #e2e3e5; color: #6c757d; }
+
+        .vaccine-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .vaccine-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .vaccine-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn-record {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-record:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-view-proof {
+            padding: 12px 24px;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-view-proof:hover {
+            background: #e0e0e0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: white;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 95vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Header */
+        .record-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px;
+            border-radius: 24px 24px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .header-content {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 4px 0;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Form */
+        .record-form {
+            padding: 32px;
+        }
+
+        /* Sections */
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-icon {
+            font-size: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        /* Form Groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .label-text {
+            display: inline;
+        }
+
+        .required {
+            color: #ff4757;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-hint {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed #e0e0e0;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 8px 0;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 20px 0;
+        }
+
+        .btn-upload {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-hint {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-preview:hover .preview-overlay {
+            opacity: 1;
+        }
+
+        .btn-change,
+        .btn-remove {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-change {
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+        }
+
+        .btn-remove {
+            background: rgba(255, 71, 87, 0.9);
+            color: white;
+        }
+
+        .btn-change:hover,
+        .btn-remove:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 16px;
+            padding-top: 24px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn-cancel {
+            padding: 16px;
+            background: white;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .btn-submit {
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-text {
+            display: inline;
+        }
+
+        .btn-loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .pet-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .vaccine-timeline {
+                padding-left: 0;
+            }
+
+            .timeline-line,
+            .timeline-dot {
+                display: none;
+            }
+
+            .vaccine-details,
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .vaccine-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .record-modal-header {
+                padding: 24px;
+                border-radius: 0;
+            }
+
+            .record-form {
+                padding: 24px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .col-span-2 {
+                grid-column: span 1;
+            }
+
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-area {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <div class="brand-icon">🐾</div>
+            <span class="brand-text">Petizo</span>
+        </a>
+        <button class="btn-back" onclick="goBack()">← ย้อนกลับ</button>
+    </nav>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Pet Header -->
+        <div class="pet-header" id="petHeader">
+            <div class="loading">กำลังโหลดข้อมูล...</div>
+        </div>
+
+        <!-- Page Title -->
+        <div class="page-title">
+            <h1>
+                💉 ตารางวัคซีนแนะนำ
+                <span class="notification-badge" id="dueCount" style="display: none;">0</span>
+            </h1>
+        </div>
+
+        <!-- Vaccine Timeline -->
+        <div class="vaccine-timeline" id="vaccineTimeline">
+            <div class="timeline-line"></div>
+            <div class="loading">กำลังโหลดตารางวัคซีน...</div>
+        </div>
+    </div>
+
+    <!-- Record Vaccination Modal -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="record-modal-header">
+                <div class="header-content">
+                    <div class="header-icon">💉</div>
+                    <div>
+                        <h2 class="header-title">บันทึกการฉีดวัคซีน</h2>
+                        <p class="header-subtitle" id="modalVaccineName">FVRCP (ครั้งที่ 1)</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeRecordModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="recordForm" onsubmit="handleRecordVaccination(event)" class="record-form">
+                <input type="hidden" id="scheduleId">
+                <input type="hidden" id="recordVaccineName">
+
+                <!-- Section 1: ข้อมูลการฉีด -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <span class="section-icon">📅</span>
+                        <h3 class="section-title">ข้อมูลการฉีด</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group col-span-2">
+                            <label class="form-label">
+                                <span class="label-text">วันที่ฉีดจริง</span>
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="recordVaccinationDate" 
+                                class="form-input" 
+                                required
+                                max="">
+                            <small class="form-hint">เลือกวันที่ทำการฉีดวัคซีน</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="label-text">สัตวแพทย์</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="recordVeterinarian" 
+                                class="form-input"
+                                placeholder="ชื่อสัตวแพทย์ที่ทำการฉีด">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="label-text">คลินิก/โรงพยาบาล</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="recordClinicName" 
+                                class="form-input"
+                                placeholder="ชื่อสถานที่">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="label-text">Batch Number</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="recordBatchNumber" 
+                                class="form-input"
+                                placeholder="หมายเลขล็อตวัคซีน">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="label-text">วันนัดหมายครั้งถัดไป</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="recordNextDueDate" 
+                                class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: อัปโหลดหลักฐาน -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <span class="section-icon">📸</span>
+                        <h3 class="section-title">หลักฐานการฉีด</h3>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <input 
+                            type="file" 
+                            id="recordProofImage" 
+                            accept="image/*" 
+                            required
+                            onchange="handleImagePreview(event)"
+                            style="display: none;">
+                        
+                        <div class="upload-content" id="uploadContent">
+                            <div class="upload-icon">📷</div>
+                            <h4 class="upload-title">อัปโหลดรูปภาพหลักฐาน</h4>
+                            <p class="upload-text">ใบรับรองการฉีดวัคซีน หรือรูปถ่ายหลักฐาน</p>
+                            <button type="button" class="btn-upload" onclick="document.getElementById('recordProofImage').click()">
+                                เลือกไฟล์
+                            </button>
+                            <small class="upload-hint">รองรับ JPG, PNG (ไม่เกิน 5MB)</small>
+                        </div>
+
+                        <!-- Preview Image -->
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview">
+                            <div class="preview-overlay">
+                                <button type="button" class="btn-change" onclick="document.getElementById('recordProofImage').click()">
+                                    เปลี่ยนรูป
+                                </button>
+                                <button type="button" class="btn-remove" onclick="removeImage()">
+                                    ลบรูป
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: หมายเหตุ -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <span class="section-icon">📝</span>
+                        <h3 class="section-title">หมายเหตุเพิ่มเติม</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea 
+                            id="recordNotes" 
+                            class="form-textarea"
+                            rows="4"
+                            placeholder="บันทึกเพิ่มเติม เช่น อาการแพ้, ราคา, สิ่งที่ต้องสังเกต..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeRecordModal()">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="btn-text">บันทึกการฉีดวัคซีน</span>
+                        <span class="btn-loading">
+                            <span class="spinner"></span>
+                            กำลังบันทึก...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script>
+        const API_URL = CONFIG.API_URL;
+        let currentPetId = null;
+        let currentPet = null;
+
+        // Get pet ID from URL
+        function getPetIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('petId');
+        }
+
+        // Go back
+        function goBack() {
+            window.location.href = 'your-pet.html';
+        }
+
+        // Load pet info
+        async function loadPetInfo() {
+            currentPetId = getPetIdFromURL();
+            
+            if (!currentPetId) {
+                window.location.href = 'your-pet.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/pets/${currentPetId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load pet');
+
+                currentPet = await response.json();
+                displayPetHeader();
+                loadVaccineSchedule();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('petHeader').innerHTML = `
+                    <div style="color: #ff4d4f;">ไม่สามารถโหลดข้อมูลได้</div>
+                `;
+            }
+        }
+
+        // Display pet header
+        function displayPetHeader() {
+            const header = document.getElementById('petHeader');
+            
+            const birthDate = currentPet.birth_date 
+                ? new Date(currentPet.birth_date).toLocaleDateString('th-TH')
+                : 'ไม่ระบุ';
+
+            // Calculate age
+            let ageText = '';
+            let ageWeeks = 0;
+            
+            if (currentPet.birth_date) {
+                const birth = new Date(currentPet.birth_date);
+                const today = new Date();
+                ageWeeks = Math.floor((today - birth) / (7 * 24 * 60 * 60 * 1000));
+                
+                const years = Math.floor(ageWeeks / 52);
+                const months = Math.floor((ageWeeks % 52) / 4.33);
+                
+                if (years > 0) {
+                    ageText = `${years} ปี`;
+                    if (months > 0) ageText += ` ${months} เดือน`;
+                } else if (months > 0) {
+                    ageText = `${months} เดือน`;
+                } else {
+                    const weeks = ageWeeks % 4;
+                    ageText = `${weeks} สัปดาห์`;
+                }
+            }
+
+            header.innerHTML = `
+                <div class="pet-avatar">
+                    ${currentPet.photo_url 
+                        ? `<img src="${currentPet.photo_url}" alt="${currentPet.name}">` 
+                        : '🐱'}
+                </div>
+                <div class="pet-info">
+                    <div class="pet-name">${currentPet.name}</div>
+                    ${ageText ? `<div class="pet-age">อายุ: ${ageText}</div>` : ''}
+                    <div class="pet-details">
+                        ${currentPet.breed ? `สายพันธุ์: ${currentPet.breed}<br>` : ''}
+                        ${currentPet.gender ? `เพศ: ${currentPet.gender === 'male' ? 'ผู้' : 'เมีย'}<br>` : ''}
+                        วันเกิด: ${birthDate}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load vaccine schedule
+        async function loadVaccineSchedule() {
+            try {
+                const response = await fetch(`${API_URL}/pets/${currentPetId}/recommended-vaccines`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load schedule');
+
+                const data = await response.json();
+                displayVaccineSchedule(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('vaccineTimeline').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-text">ไม่สามารถโหลดตารางวัคซีนได้</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Display vaccine schedule
+        function displayVaccineSchedule(data) {
+            const timeline = document.getElementById('vaccineTimeline');
+            
+            if (!data.vaccines || data.vaccines.length === 0) {
+                timeline.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💉</div>
+                        <div class="empty-text">${data.message || 'ไม่พบข้อมูลตารางวัคซีน'}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // แยกวัคซีนออกเป็น 2 กลุ่ม
+            const activeVaccines = data.vaccines.filter(v => v.status !== 'completed');
+            const completedVaccines = data.vaccines.filter(v => v.status === 'completed');
+
+            // Count due vaccines
+            const dueCount = activeVaccines.filter(v => 
+                v.status === 'due' || v.status === 'overdue'
+            ).length;
+            
+            if (dueCount > 0) {
+                const badge = document.getElementById('dueCount');
+                badge.style.display = 'inline-block';
+                badge.textContent = dueCount;
+            }
+
+            // Build timeline
+            let html = '<div class="timeline-line"></div>';
+            
+            // ฟังก์ชันสร้าง vaccine card
+            const createVaccineCard = (vaccine) => {
+                const statusText = {
+                    'completed': '✓ ฉีดแล้ว',
+                    'due': '⚠️ ถึงกำหนด',
+                    'overdue': '🚨 เกินกำหนด',
+                    'upcoming': '📅 กำลังจะถึง'
+                }[vaccine.status];
+
+                const dueDate = vaccine.due_date 
+                    ? new Date(vaccine.due_date).toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })
+                    : '-';
+
+                // ใช้ข้อมูลจาก backend
+                const ageRange = vaccine.age_range_text || 'ไม่ระบุ';
+                const currentAge = vaccine.pet_age_text || 'ไม่ระบุ';
+
+                return `
+                    <div class="vaccine-item">
+                        <div class="timeline-dot ${vaccine.status}"></div>
+                        <div class="vaccine-card ${vaccine.status}">
+                            <div class="vaccine-header">
+                                <div>
+                                    <div class="vaccine-name">${vaccine.vaccine_name}</div>
+                                    <div class="vaccine-date">📅 ${dueDate}</div>
+                                </div>
+                                <div class="vaccine-status status-${vaccine.status}">
+                                    ${statusText}
+                                </div>
+                            </div>
+
+                            ${vaccine.description ? `
+                                <div class="vaccine-description">
+                                    ${vaccine.description}
+                                </div>
+                            ` : ''}
+
+                            <div class="vaccine-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">ช่วงอายุที่แนะนำ</div>
+                                    <div class="detail-value">${ageRange}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">อายุปัจจุบัน</div>
+                                    <div class="detail-value">${currentAge}</div>
+                                </div>
+                                ${vaccine.is_booster ? `
+                                    <div class="detail-item">
+                                        <div class="detail-label">ประเภท</div>
+                                        <div class="detail-value">🔄 วัคซีนบูสเตอร์</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            ${!vaccine.is_completed && (vaccine.status === 'due' || vaccine.status === 'overdue') ? `
+                                <div class="vaccine-actions">
+                                    <button class="btn-record" onclick="openRecordModal(${vaccine.id}, '${vaccine.vaccine_name}')">
+                                        📝 บันทึกการฉีด
+                                    </button>
+                                </div>
+                            ` : ''}
+
+                            ${vaccine.is_completed ? `
+                                <div class="vaccine-actions">
+                                    <button class="btn-view-proof" onclick="viewProof(${vaccine.id})">
+                                        📄 ดูหลักฐาน
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            };
+
+            // วัคซีนที่ยังไม่ฉีด
+            activeVaccines.forEach(vaccine => {
+                html += createVaccineCard(vaccine);
+            });
+
+            // เส้นแบ่งระหว่างกลุ่ม
+            if (completedVaccines.length > 0 && activeVaccines.length > 0) {
+                html += `
+                    <div style="margin: 40px 0; text-align: center; color: #999; position: relative;">
+                        <hr style="border: none; border-top: 2px dashed #e0e0e0; margin: 20px 0;">
+                        <div style="margin-top: 10px; font-size: 16px; font-weight: 600;">
+                            ✅ วัคซีนที่ฉีดแล้ว (${completedVaccines.length} รายการ)
+                        </div>
+                    </div>
+                `;
+            }
+
+            // วัคซีนที่ฉีดแล้ว
+            completedVaccines.forEach(vaccine => {
+                html += createVaccineCard(vaccine);
+            });
+
+            timeline.innerHTML = html;
+        }
+
+        // Open record modal
+        function openRecordModal(scheduleId, vaccineName) {
+            document.getElementById('scheduleId').value = scheduleId;
+            document.getElementById('recordVaccineName').value = vaccineName;
+            document.getElementById('modalVaccineName').textContent = vaccineName;
+            document.getElementById('recordVaccinationDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('recordModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close record modal
+        function closeRecordModal() {
+            document.getElementById('recordModal').classList.remove('active');
+            document.getElementById('recordForm').reset();
+            removeImage();
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle image preview
+        function handleImagePreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('ไฟล์มีขนาดใหญ่เกินไป กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB');
+                    event.target.value = '';
+                    return;
+                }
+
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+                    event.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove image
+        function removeImage() {
+            document.getElementById('recordProofImage').value = '';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('uploadContent').style.display = 'flex';
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+
+        // Handle record vaccination
+        async function handleRecordVaccination(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            
+            // Show loading
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            
+            const formData = new FormData();
+            formData.append('vaccine_name', document.getElementById('recordVaccineName').value);
+            formData.append('vaccination_date', document.getElementById('recordVaccinationDate').value);
+            formData.append('veterinarian', document.getElementById('recordVeterinarian').value);
+            formData.append('clinic_name', document.getElementById('recordClinicName').value);
+            formData.append('batch_number', document.getElementById('recordBatchNumber').value);
+            formData.append('notes', document.getElementById('recordNotes').value);
+            formData.append('next_due_date', document.getElementById('recordNextDueDate').value);
+            formData.append('schedule_id', document.getElementById('scheduleId').value);
+            
+            const proofFile = document.getElementById('recordProofImage').files[0];
+            if (proofFile) {
+                formData.append('proof', proofFile);
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/pets/${currentPetId}/vaccinations`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Success animation
+                    submitBtn.innerHTML = '<span style="display: flex; align-items: center; gap: 8px;"><span>✓</span> บันทึกสำเร็จ!</span>';
+                    setTimeout(() => {
+                        closeRecordModal();
+                        loadVaccineSchedule();
+                        
+                        // Reset button
+                        btnText.style.display = 'inline';
+                        btnLoading.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span class="btn-text">บันทึกการฉีดวัคซีน</span><span class="btn-loading"><span class="spinner"></span>กำลังบันทึก...</span>';
+                    }, 1500);
+                } else {
+                    const data = await response.json();
+                    alert('❌ เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถบันทึกได้'));
+                    
+                    // Reset button
+                    submitBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnLoading.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+                
+                // Reset button
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        }
+
+        // View proof
+        function viewProof(vaccineId) {
+            window.location.href = `vaccination-record.html?petId=${currentPetId}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Set max date to today
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('recordVaccinationDate');
+            if (dateInput) {
+                dateInput.max = today;
+            }
+
+            loadPetInfo();
+        });
+
+        // Close modal on outside click
+        document.getElementById('recordModal').addEventListener('click', (e) => {
+            if (e.target.id === 'recordModal') {
+                closeRecordModal();
+            }
+        });
+    </script>
+</body>
+</html>
