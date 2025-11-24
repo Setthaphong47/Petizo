@@ -1,6 +1,113 @@
 # Petizo - Pet Management System
 
-## 🚀 Deploy to Vercel
+## 🚀 Deploy to Vercel (แนะนำ)
+
+### ขั้นตอนที่ 1: Deploy บน Vercel
+
+1. ไปที่ https://vercel.com/
+2. Sign up/Login ด้วย GitHub
+3. คลิก "Add New..." → "Project"
+4. เลือก repository `Petizo`
+5. คลิก "Deploy"
+
+### ขั้นตอนที่ 2: เพิ่ม Vercel Postgres Database
+
+1. ไปที่ Project Dashboard
+2. คลิกแท็บ "Storage"
+3. คลิก "Create Database" → เลือก "Postgres"
+4. ตั้งชื่อ: `petizo-db`
+5. เลือก Region ใกล้ที่สุด (Singapore)
+6. คลิก "Create"
+
+### ขั้นตอนที่ 3: Import Database Schema
+
+1. ไปที่ Storage → petizo-db
+2. คลิกแท็บ "Query"
+3. คัดลอกเนื้อหาจากไฟล์ `init-postgres.sql`
+4. วางใน Query Editor แล้วกด "Run"
+
+### ขั้นตอนที่ 4: ตั้งค่า Environment Variables
+
+1. ไปที่ Project Settings → Environment Variables
+2. Vercel จะเพิ่ม `POSTGRES_URL` อัตโนมัติ
+3. เพิ่ม variables เหล่านี้:
+
+```
+JWT_SECRET=your-super-secret-jwt-key-change-this
+NODE_ENV=production
+```
+
+4. คลิก "Redeploy" เพื่อใช้ค่าใหม่
+
+### ขั้นตอนที่ 5: เสร็จสิ้น!
+
+เว็บไซต์จะพร้อมใช้งานที่ URL ที่ Vercel สร้างให้ เช่น:
+`https://petizo-xxxxx.vercel.app`
+
+---
+
+## 📝 Login Credentials
+
+**Admin:**
+- Email: admin@petizo.com
+- Password: admin123
+
+**Test User:**
+- Email: user@petizo.com  
+- Password: user123
+
+---
+
+## 🔧 Local Development
+
+```bash
+# ติดตั้ง dependencies
+npm install
+
+# รัน server
+node server.js
+
+# เปิดเบราว์เซอร์ที่
+http://localhost:3000
+```
+
+---
+
+## 📦 Tech Stack
+
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Node.js, Express
+- **Database**: 
+  - SQLite (Local Development)
+  - PostgreSQL (Production - Vercel)
+- **Authentication**: JWT
+- **Hosting**: Vercel
+
+---
+
+## ⚠️ หมายเหตุ
+
+- รูปภาพที่อัพโหลดจะหายหลัง redeploy (Vercel Serverless)
+- แนะนำใช้ Cloudinary หรือ AWS S3 สำหรับเก็บรูป
+- Database จะใช้ PostgreSQL บน Vercel แทน SQLite
+
+---
+
+## 🆘 Troubleshooting
+
+**ปัญหา: Database connection error**
+- ตรวจสอบว่าได้เพิ่ม Vercel Postgres แล้ว
+- ตรวจสอบว่า `POSTGRES_URL` มีใน Environment Variables
+- ลอง redeploy โปรเจค
+
+**ปัญหา: 404 Not Found**
+- ตรวจสอบ `vercel.json` config
+- ตรวจสอบ routes ใน `server.js`
+
+**ปัญหา: Images not loading**
+- ใช้ Cloudinary สำหรับเก็บรูป
+- หรือใช้ Vercel Blob Storage
+
 
 ### ขั้นตอนที่ 1: เตรียม GitHub Repository
 
